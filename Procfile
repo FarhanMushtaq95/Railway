@@ -1,3 +1,2 @@
-command:
-  migrate: python manage.py migrate
-  web: gunicorn AdsManager.wsgi
+migrate: python manage.py migrate
+web: gunicorn AdsManager.wsgi
