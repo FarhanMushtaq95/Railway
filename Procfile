@@ -1,1 +1,1 @@
-web: gunicorn AdsManager.wsgi --logfile -
+python manage.py migrate && gunicorn AdsManager.wsgi
