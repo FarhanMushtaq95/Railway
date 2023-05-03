@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import BusinessRegistration, BusinessImage, Keywords
+from .models import BusinessRegistration, BusinessImage, Keywords , Category
 
 
 import pyrebase
@@ -76,6 +76,13 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 media.save()
                 business.images.set(media)
         return instance
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
 
 class KeywordsListSerializer(serializers.ModelSerializer):
     class Meta:
