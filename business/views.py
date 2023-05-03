@@ -2,8 +2,8 @@ import csv
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import exceptions
-from .models import BusinessRegistration
-from .serializers import BusinessListSerializer,BusinessRegistrationSerializer
+from .models import BusinessRegistration,Category
+from .serializers import BusinessListSerializer,BusinessRegistrationSerializer , CategoryListSerializer
 
 class BusinessView(APIView):
 
@@ -57,3 +57,25 @@ class BusinessView(APIView):
             return Response({"detail": "Business updated"}, status=200)
         else:
             return Response(serializer.errors, status=422)
+
+
+class CategoryView(APIView):
+
+    # This class is used for getting all Places
+    def get(self, request):
+
+        # Checking permissions
+
+        id = request.GET.get('id', None)
+        if id is not None:
+            query_set = Category.objects.filter(id=id)
+        else:
+            query_set = Category.objects.all().order_by('-id')
+
+        if not query_set:
+            data = []
+
+            return Response(data, status=200)
+        serializer = CategoryListSerializer(query_set, many=True)
+
+        return Response(serializer.data, status=200)
