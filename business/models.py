@@ -19,6 +19,14 @@ class BusinessImage(models.Model):
     class Meta:
         ordering = ('-created_at',)
 
+
+class Keywords(models.Model):
+    keywords = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.keywords
+
+
 class BusinessRegistration(models.Model):
     business_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
@@ -33,16 +41,31 @@ class BusinessRegistration(models.Model):
     business_description = models.TextField()
     business_days_and_hours = models.TextField()
     images = models.ManyToManyField('BusinessImage',related_name='BusinessImages')
+    keyword = models.ManyToManyField('Keywords', related_name='businesskeywords')
 
     def __str__(self):
         return self.business_name
 
 
 
-class Keywords(models.Model):
-    business = models.ForeignKey('BusinessRegistration', on_delete=models.CASCADE, related_name='keywords')
-    keywords = models.CharField(max_length=255)
+
+
+class BusinessHour(models.Model):
+    DAY_CHOICES = [
+        ('mon', 'Monday'),
+        ('tue', 'Tuesday'),
+        ('wed', 'Wednesday'),
+        ('thu', 'Thursday'),
+        ('fri', 'Friday'),
+        ('sat', 'Saturday'),
+        ('sun', 'Sunday'),
+    ]
+
+    business = models.ForeignKey(BusinessRegistration, on_delete=models.CASCADE, related_name='business_hours')
+    day = models.CharField(max_length=3, choices=DAY_CHOICES)
+    opening_time = models.TimeField()
+    closing_time = models.TimeField()
+    closed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.keywords
-
+        return self.business.business_name

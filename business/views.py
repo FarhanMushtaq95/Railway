@@ -2,8 +2,8 @@ import csv
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import exceptions
-from .models import BusinessRegistration,Category
-from .serializers import BusinessListSerializer,BusinessRegistrationSerializer , CategoryListSerializer
+from .models import BusinessRegistration,Category,Keywords
+from .serializers import BusinessListSerializer,BusinessRegistrationSerializer , CategoryListSerializer, KeywordsListSerializer
 
 class BusinessView(APIView):
 
@@ -61,7 +61,7 @@ class BusinessView(APIView):
 
 class CategoryView(APIView):
 
-    # This class is used for getting all Places
+    # This class is used for getting all Category
     def get(self, request):
 
         # Checking permissions
@@ -77,5 +77,27 @@ class CategoryView(APIView):
 
             return Response(data, status=200)
         serializer = CategoryListSerializer(query_set, many=True)
+
+        return Response(serializer.data, status=200)
+
+
+class KeywordView(APIView):
+
+    # This class is used for getting all Places
+    def get(self, request):
+
+        # Checking permissions
+
+        id = request.GET.get('id', None)
+        if id is not None:
+            query_set = Keywords.objects.filter(id=id)
+        else:
+            query_set = Keywords.objects.all().order_by('-id')
+
+        if not query_set:
+            data = []
+
+            return Response(data, status=200)
+        serializer = KeywordsListSerializer(query_set, many=True)
 
         return Response(serializer.data, status=200)

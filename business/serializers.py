@@ -107,7 +107,7 @@ class BusinessListSerializer(serializers.ModelSerializer):
     def get_keywords(self, obj):
         data = {}
         serializer_context = {'request': self.context.get('request')}
-        keywords_data = Keywords.objects.filter(keywords=obj)
+        keywords_data = Keywords.objects.filter(businesskeywords=obj)
         serializer = KeywordsListSerializer(keywords_data, many=True, context=serializer_context)
         try:
             return serializer.data
