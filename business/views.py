@@ -20,7 +20,7 @@ class BusinessView(APIView):
         elif state is not None:
             query_set = BusinessRegistration.objects.filter(state=state)
         elif zip is not None:
-            query_set = BusinessRegistration.objects.filter(zip=zip)
+            query_set = BusinessRegistration.objects.filter(city_zip=zip)
         else:
             query_set = BusinessRegistration.objects.all().order_by('-id')
 
