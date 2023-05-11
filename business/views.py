@@ -14,7 +14,7 @@ class BusinessView(APIView):
 
         id = request.GET.get('id', None)
         state = request.GET.get('state', None)
-        zip = request.Get.get('zip', None)
+        zip = request.GET.get('zip', None)
         if id is not None:
             query_set = BusinessRegistration.objects.filter(id=id)
         elif state is not None:
