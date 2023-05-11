@@ -62,9 +62,11 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         if keywords:
             business.keyword.set(keywords)
         return business
+
     def update(self, instance, validate_data):
         validated_data = self.initial_data
         images_data = validated_data.pop('images', None)
+        keywords = validated_data.pop('keyword', None)
         BusinessRegistration.objects.filter(id=instance.id).update(**validated_data)
         business = BusinessRegistration.objects.get(id=instance.id)
         if images_data:
@@ -78,6 +80,8 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 media.deleted_at = None
                 media.save()
                 business.images.set(media)
+        if keywords:
+            business.keyword.set(keywords)
         return instance
 
 
