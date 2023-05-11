@@ -13,8 +13,14 @@ class BusinessView(APIView):
         # Checking permissions
 
         id = request.GET.get('id', None)
+        state = request.GET.get('state', None)
+        zip = request.Get.get('zip', None)
         if id is not None:
             query_set = BusinessRegistration.objects.filter(id=id)
+        elif state is not None:
+            query_set = BusinessRegistration.objects.filter(state=state)
+        elif zip is not None:
+            query_set = BusinessRegistration.objects.filter(zip=zip)
         else:
             query_set = BusinessRegistration.objects.all().order_by('-id')
 
