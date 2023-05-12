@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'authentication',
     'business',
     'corsheaders',
+    'websitepost',
 ]
 
 REST_FRAMEWORK = {
