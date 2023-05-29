@@ -82,5 +82,5 @@ class SignUpAPIView(APIView):
             return Response({'error': 'Username already exists'})
 
         # Create the new user
-        user = User.objects.create_user(email=username, password=password)
+        user = User.objects.create_user(email=username, password=password, username=username)
         return Response({'success': 'User created'})
