@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Post, Category, City, State
 from .serializers import PostSerializer, CitySerializer, CategorySerializer, StateSerializer
+from authentication.models import CustomUser as User
 
 class CreatePostView(APIView):
     permission_classes = [permissions.IsAuthenticated] # Ensure user is authenticated
@@ -69,3 +70,17 @@ class GetCategoryView(APIView):
         # Serialize the queryset to a list of serialized data
         serializer = CategorySerializer(posts, many=True)
         return Response(serializer.data, status=200)
+
+class SignUpAPIView(APIView):
+    permission_classes = []
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        # Check if the username already exists
+        if User.objects.filter(email=username).exists():
+            return Response({'error': 'Username already exists'})
+
+        # Create the new user
+        user = User.objects.create_user(email=username, password=password)
+        return Response({'success': 'User created'})

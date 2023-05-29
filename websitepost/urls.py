@@ -9,6 +9,7 @@ urlpatterns = [
     path('getcity/', GetCityView.as_view(), name='getcity'),
     path('getstate/', GetStateView.as_view(), name='getstate'),
     path('getcategory/', GetCategoryView.as_view(), name='getcategory'),
+    path('signup/', SignUpAPIView.as_view(), name='signup'),
 
 
 ]
