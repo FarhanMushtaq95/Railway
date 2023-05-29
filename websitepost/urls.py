@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import CreatePostView, GetPostView, GetCityView, GetStateView, GetCategoryView
+from .views import CreatePostView, GetPostView, GetCityView, GetStateView, GetCategoryView, SignUpAPIView
 
 
 urlpatterns = [
