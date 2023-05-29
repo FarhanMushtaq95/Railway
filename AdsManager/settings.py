@@ -54,7 +54,7 @@ REST_FRAMEWORK = {
 'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),  #
 }
-AUTHENTICATION_BACKENDS = ['authentication.auth_backends.EmailBackend']
+AUTHENTICATION_BACKENDS = ['authentication.auth_backends.WebsiteBackend','authentication.auth_backends.AdminBackend']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 SIMPLE_JWT = {
