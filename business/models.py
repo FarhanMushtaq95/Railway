@@ -39,7 +39,7 @@ class BusinessRegistration(models.Model):
     city2 = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     business_description = models.TextField()
-    business_days_and_hours = models.TextField()
+    business_days_and_hours = models.ManyToManyField('BusinessHour',related_name='Days_hours')
     images = models.ManyToManyField('BusinessImage',related_name='BusinessImages')
     keyword = models.ManyToManyField('Keywords', related_name='businesskeywords')
 
@@ -63,8 +63,8 @@ class BusinessHour(models.Model):
 
     business = models.ForeignKey(BusinessRegistration, on_delete=models.CASCADE, related_name='business_hours')
     day = models.CharField(max_length=3, choices=DAY_CHOICES)
-    opening_time = models.TimeField()
-    closing_time = models.TimeField()
+    opening_time = models.TimeField(null=True)
+    closing_time = models.TimeField(null=True)
     closed = models.BooleanField(default=False)
 
     def __str__(self):

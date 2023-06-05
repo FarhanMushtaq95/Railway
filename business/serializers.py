@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import BusinessRegistration, BusinessImage, Keywords , Category
+from .models import BusinessRegistration, BusinessImage, Keywords , Category, BusinessHour
 
 
 import pyrebase
@@ -35,9 +35,15 @@ firebase_config = {
 firebase = pyrebase.initialize_app(firebase_config)
 storage = firebase.storage()
 
+class BusinessHoursSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessHour
+        fields = ('day', 'opening_time', 'closing_time', 'closed')
+
 
 class BusinessRegistrationSerializer(serializers.ModelSerializer):
     images = serializers.ListField(child=serializers.ImageField(), write_only=True)
+    business_days_and_hours = BusinessHoursSerializer(many=True, required=False)
 
     class Meta:
         model = BusinessRegistration
@@ -45,8 +51,8 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images_data = validated_data.pop('images', None)
-        keywords = validated_data.pop('keyword', None)
-        business_days_and_hours_data = validated_data.pop('business_days_and_hours',None)
+        keywords = validated_data.pop('keyword',None)
+        day_and_business = validated_data.pop('business_days_and_hours',None)
         business = BusinessRegistration.objects.create(**validated_data)
 
         if images_data:
@@ -62,9 +68,56 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 business.images.add(media)
         if keywords:
             business.keyword.set(keywords)
-
+        if day_and_business:
+            var = [
+                    {
+                            "day": "MON",
+                            "open_time": "09:00:00",
+                            "close_time": "17:00:00",
+                            "closed": False
+                    },
+                    {
+                        "day": "TUE",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "WED",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "THU",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "FRI",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "SAT",
+                        "open_time": None,
+                        "close_time": None,
+                        "closed": True
+                    },
+                    {
+                        "day": "SUN",
+                        "open_time": None,
+                        "close_time": None,
+                        "closed":True
+                    }
+            ]
+            for obj in var:
+                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                business.business_days_and_hours.add(bus)
+                business.save()
         return business
-
     def update(self, instance, validate_data):
         validated_data = self.initial_data
         images_data = validated_data.pop('images', None)
@@ -108,6 +161,8 @@ class BusinessMediaSerializer(serializers.ModelSerializer):
 class BusinessListSerializer(serializers.ModelSerializer):
     keywords = serializers.SerializerMethodField('get_keywords')
     Media = serializers.SerializerMethodField('get_Media')
+    business_days_and_hours = BusinessHoursSerializer(many=True, required=False)
+
 
     class Meta:
         model = BusinessRegistration
