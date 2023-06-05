@@ -4,6 +4,15 @@ import business.models as Bus
 
 # Create your models here.
 
+class PostImage(models.Model):
+    file_name = models.TextField(blank=True, null=True)
+    file_path = models.TextField(blank=True, null=True)
+    cdn_link = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
 
 class Category(models.Model):
     name = models.CharField(max_length=150)
@@ -37,6 +46,7 @@ class Post(models.Model):
     business = models.ForeignKey(Bus.BusinessRegistration, on_delete=models.CASCADE, related_name="business_post",null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    images = models.ManyToManyField('PostImage',related_name='PostImages')
 
     def __str__(self):
         return self.title
