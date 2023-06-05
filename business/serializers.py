@@ -68,7 +68,7 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 business.images.add(media)
         if keywords:
             business.keyword.set(keywords)
-        if day_and_business:
+        if day_and_business is None:
             var = [
                     {
                             "day": "MON",
@@ -114,6 +114,11 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                     }
             ]
             for obj in var:
+                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                business.business_days_and_hours.add(bus)
+                business.save()
+        else:
+            for obj in day_and_business:
                 bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
                 business.business_days_and_hours.add(bus)
                 business.save()
