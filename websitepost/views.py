@@ -81,7 +81,7 @@ class SignUpAPIView(APIView):
 
         # Check if the username already exists
         if User.objects.filter(email=username).exists():
-            return Response({'error': 'Username already exists'})
+            return Response({'error': 'Username already exists'},status=409)
 
         # Create the new user
         user = User.objects.create_user(email=username, password=password, username=username)
