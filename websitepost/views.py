@@ -75,10 +75,14 @@ class GetCategoryView(APIView):
 class SignUpAPIView(APIView):
     permission_classes = []
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get('username',None)
+        password = request.data.get('password',None)
         website = request.data.get('website')
 
+        if username is None or username == '':
+            return Response({'error': 'Username not provided'}, status=401)
+        if password is None or password == '':
+            return Response({'error': 'Password not provided'}, status=401)
         # Check if the username already exists
         if User.objects.filter(email=username).exists():
             return Response({'error': 'Username already exists'},status=409)
