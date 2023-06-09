@@ -42,7 +42,7 @@ class BusinessHoursSerializer(serializers.ModelSerializer):
 
 
 class BusinessRegistrationSerializer(serializers.ModelSerializer):
-    images = serializers.ListField(child=serializers.ImageField(), write_only=True)
+    images = serializers.ListField(child=serializers.ImageField(), write_only=True,required=False)
     business_days_and_hours = BusinessHoursSerializer(many=True, required=False)
 
     class Meta:

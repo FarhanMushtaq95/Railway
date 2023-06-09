@@ -29,8 +29,8 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'address', 'email', 'number', 'category', 'state', 'city','business', 'schedule_time']
 
 class PostcrudSerializer(serializers.ModelSerializer):
-    images = serializers.ListField(child=serializers.ImageField(), write_only=True)
-    logo = serializers.ListField(child=serializers.ImageField(), write_only=True)
+    images = serializers.ListField(child=serializers.ImageField(), write_only=True,required=False)
+    logo = serializers.ListField(child=serializers.ImageField(), write_only=True,required=False)
 
     class Meta:
         model = Post
