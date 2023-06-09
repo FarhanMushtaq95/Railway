@@ -30,6 +30,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 class PostcrudSerializer(serializers.ModelSerializer):
     images = serializers.ListField(child=serializers.ImageField(), write_only=True)
+    logo = serializers.ListField(child=serializers.ImageField(), write_only=True)
 
     class Meta:
         model = Post
@@ -37,6 +38,7 @@ class PostcrudSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images_data = validated_data.pop('images', None)
+        logo = validated_data.pop('logo',None)
         post = Post.objects.create(**validated_data)
 
         if images_data:
@@ -50,6 +52,17 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 media.deleted_at = None
                 media.save()
                 post.images.add(media)
+        if logo:
+            for image_data in logo:
+                media = PostImage()
+                firebase_data = storage.child("files/" + image_data.name).put(image_data)
+                media.file_path = storage.child("files/" + image_data.name).get_url(firebase_data['generation'])
+                media.cdn_link = storage.child("files/" + image_data.name).get_url(firebase_data['generation'])
+                media.file_name = image_data.name
+                media.deleted = False
+                media.deleted_at = None
+                media.save()
+                post.logo = media
 
         return post
     def update(self, instance, validate_data):
@@ -71,6 +84,7 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 business.images.set(media)
 
         return instance
+
 
 class PostListSerializer(serializers.ModelSerializer):
     Media = serializers.SerializerMethodField('get_Media')

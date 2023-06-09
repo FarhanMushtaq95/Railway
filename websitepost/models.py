@@ -39,14 +39,18 @@ class Post(models.Model):
     address = models.CharField(max_length=500)
     email = models.EmailField()
     number = models.CharField(max_length=50)
+    price = models.CharField(max_length=50,blank=True,null=True,default="")
+    zipcode = models.CharField(max_length=50, blank=True, null=True,default="")
     category = models.ForeignKey(Category,on_delete=models.CASCADE, related_name="post_category")
     state = models.ForeignKey(State,on_delete=models.CASCADE,related_name="post_state")
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="post_city")
-    schedule_time = models.DateTimeField(null=True)
+    schedule_time_start = models.DateTimeField(null=True)
+    schedule_time_end = models.DateTimeField(null=True)
     business = models.ForeignKey(Bus.BusinessRegistration, on_delete=models.CASCADE, related_name="business_post",null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     images = models.ManyToManyField('PostImage',related_name='PostImages')
+    logo = models.ForeignKey('PostImage',related_name='Postlogo', on_delete=models.CASCADE,default=1)
 
     def __str__(self):
         return self.title
