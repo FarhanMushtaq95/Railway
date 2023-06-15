@@ -51,6 +51,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     images = models.ManyToManyField('PostImage',related_name='PostImages')
     logo = models.ForeignKey('PostImage',related_name='Postlogo', on_delete=models.CASCADE,default=1)
+    is_sell = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

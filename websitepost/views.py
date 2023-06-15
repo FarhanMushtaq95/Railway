@@ -21,14 +21,22 @@ class GetPostView(APIView):
     permission_classes = [] # Ensure user is authenticated
     def get(self, request):
         # Retrieve all posts from the database
-        id = request.GET.get('id',None)
+        id = request.GET.get('id', None)
+        is_sell = request.GET.get('is_sell', None)
+        if is_sell == 'true' or is_sell == 'True':
+            is_sell = True
+        if is_sell == 'false' or is_sell == 'False':
+            is_sell = False
         if id:
-            posts = Post.objects.filter(business_id=id,schedule_time__lte=datetime.now())
+            posts = Post.objects.filter(business_id=id,schedule_time_start__lte=datetime.now(),schedule_time_end__gte=datetime.now())
+        elif is_sell:
+            posts = Post.objects.filter(is_sell=is_sell)
         else:
             posts = Post.objects.all()
         # Serialize the queryset to a list of serialized data
         serializer = PostListSerializer(posts, many=True)
         return Response(serializer.data, status=200)
+
 
 
 class GetCityView(APIView):
