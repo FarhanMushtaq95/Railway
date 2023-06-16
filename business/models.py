@@ -42,6 +42,8 @@ class BusinessRegistration(models.Model):
     business_days_and_hours = models.ManyToManyField('BusinessHour',related_name='Days_hours')
     images = models.ManyToManyField('BusinessImage',related_name='BusinessImages')
     keyword = models.ManyToManyField('Keywords', related_name='businesskeywords')
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.business_name
