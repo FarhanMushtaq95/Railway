@@ -127,8 +127,19 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         validated_data = self.initial_data
         images_data = validated_data.pop('images', None)
         keywords = validated_data.pop('keyword', None)
+        category = validated_data.pop('category', None)
+        id = validated_data.pop('id', None)
+
+        day_and_business = validated_data.pop('business_days_and_hours',None)
+        id = int(id[0])
         BusinessRegistration.objects.filter(id=instance.id).update(**validated_data)
         business = BusinessRegistration.objects.get(id=instance.id)
+        BusinessHour.objects.filter(business=business).delete()
+        # Retrieve all the associated BusinessImage objects
+        business_images = business.images.all()
+
+        # Delete the BusinessImage objects
+        business_images.delete()
         if images_data:
             for image_data in images_data:
                 media = BusinessImage()
@@ -139,9 +150,66 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 media.deleted = False
                 media.deleted_at = None
                 media.save()
-                business.images.set(media)
+                business.images.add(media)
         if keywords:
             business.keyword.set(keywords)
+        if category:
+            business.category = Category.objects.get(id=category[0])
+        if day_and_business is None:
+            var = [
+                    {
+                            "day": "MON",
+                            "open_time": "09:00:00",
+                            "close_time": "17:00:00",
+                            "closed": False
+                    },
+                    {
+                        "day": "TUE",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "WED",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "THU",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "FRI",
+                        "open_time": "09:00:00",
+                        "close_time": "17:00:00",
+                        "closed": False
+                    },
+                    {
+                        "day": "SAT",
+                        "open_time": None,
+                        "close_time": None,
+                        "closed": True
+                    },
+                    {
+                        "day": "SUN",
+                        "open_time": None,
+                        "close_time": None,
+                        "closed":True
+                    }
+            ]
+            for obj in var:
+                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                business.business_days_and_hours.add(bus)
+                business.save()
+        else:
+            for obj in day_and_business:
+                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                business.business_days_and_hours.add(bus)
+                business.save()
+
         return instance
 
 

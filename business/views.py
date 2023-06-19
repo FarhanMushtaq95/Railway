@@ -64,6 +64,15 @@ class BusinessView(APIView):
         else:
             return Response(serializer.errors, status=422)
 
+    # this function is for deleting Business
+    def delete(self,request):
+        id = request.GET.get('id', None)
+        if id:
+            BusinessRegistration.objects.filter(id=id).delete()
+            return Response({"detail: Deleted"} , status=202)
+        else:
+            return Response({"detail: please provide Id"},status=422)
+
 
 class CategoryView(APIView):
 
