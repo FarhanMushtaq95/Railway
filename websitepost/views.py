@@ -37,6 +37,14 @@ class GetPostView(APIView):
         serializer = PostListSerializer(posts, many=True)
         return Response(serializer.data, status=200)
 
+    def delete(self,request):
+        id = request.GET.get('id', None)
+        if id:
+            Post.objects.filter(id=id).delete()
+            return Response({"detail: Deleted"} , status=202)
+        else:
+            return Response({"detail: please provide Id"},status=422)
+
 
 
 class GetCityView(APIView):
