@@ -88,6 +88,7 @@ class PostcrudSerializer(serializers.ModelSerializer):
 
 class PostListSerializer(serializers.ModelSerializer):
     Media = serializers.SerializerMethodField('get_Media')
+    logo = serializers.SerializerMethodField('get_logo')
 
     class Meta:
         model = Post
@@ -99,6 +100,15 @@ class PostListSerializer(serializers.ModelSerializer):
         data = {}
         serializer_context = {'request': self.context.get('request')}
         media_data = PostImage.objects.filter(PostImages=obj)
+        serializer = PostMediaSerializer(media_data, many=True, context=serializer_context)
+        try:
+            return serializer.data
+        except:
+            return data
+    def get_logo(self, obj):
+        data = {}
+        serializer_context = {'request': self.context.get('request')}
+        media_data = PostImage.objects.filter(Postlogo=obj)
         serializer = PostMediaSerializer(media_data, many=True, context=serializer_context)
         try:
             return serializer.data
