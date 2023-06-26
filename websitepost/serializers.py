@@ -65,32 +65,39 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 post.logo = media
 
         return post
+
     def update(self, instance, validate_data):
-        validated_data = self.initial_data.copy()
+        validated_data = self.validated_data.copy()
         images_data = validated_data.pop('images', None)
-        images = validated_data.pop('imagesUpdate',None)
-        logo = validated_data.pop('logoUpdate',None)
-        logo_data = validated_data.pop('logo',None)
-        city = validated_data.pop('city',None)
-        state = validated_data.pop('state',None)
-        category = validated_data.pop('category',None)
-        business = validated_data.pop('business',None)
-        is_sell = validated_data.pop('is_sell',None)
+        if self.initial_data['imagesUpdate'] == 'true':
+            images = True
+        else:
+            images = False
+        if self.initial_data['logoUpdate'] == 'true':
+            logo = True
+        else:
+            logo = False
+        logo_data = validated_data.pop('logo', None)
+        city = validated_data.pop('city', None)
+        state = validated_data.pop('state', None)
+        category = validated_data.pop('category', None)
+        business = validated_data.pop('business', None)
+        is_sell = validated_data.pop('is_sell', None)
         # Update instance fields with validated data if provided
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.city = City.objects.get(id=int(city[0]))
-        instance.state = State.objects.get(id=int(state[0]))
-        instance.category = Category.objects.get(id=int(category[0]))
-        if is_sell[0] == 'true':
+        instance.city = city
+        instance.state = state
+        instance.category = category
+        if is_sell == 'true':
             instance.is_sell = True
-        elif is_sell[0] == 'false':
+        elif is_sell == 'false':
             instance.is_sell = False
 
         # Save the updated instance
         instance.save()
         business = Post.objects.get(id=instance.id)
-        if images[0] == 'true':
+        if images:
             PostImage.objects.filter(PostImages=business).delete()
             for image_data in images_data:
                 media = PostImage()
@@ -102,7 +109,7 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 media.deleted_at = None
                 media.save()
                 business.images.add(media)
-        if logo[0] == 'true':
+        if logo:
             for image_data in logo_data:
                 media = PostImage()
                 firebase_data = storage.child("files/" + image_data.name).put(image_data)
@@ -113,6 +120,7 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 media.deleted_at = None
                 media.save()
                 business.logo = media
+                business.save()
         return instance
 
 
