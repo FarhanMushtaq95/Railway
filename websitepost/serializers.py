@@ -66,12 +66,32 @@ class PostcrudSerializer(serializers.ModelSerializer):
 
         return post
     def update(self, instance, validate_data):
-        validated_data = self.initial_data
+        validated_data = self.initial_data.copy()
         images_data = validated_data.pop('images', None)
-        keywords = validated_data.pop('keyword', None)
-        Post.objects.filter(id=instance.id).update(**validated_data)
+        images = validated_data.pop('imagesUpdate',None)
+        logo = validated_data.pop('logoUpdate',None)
+        logo_data = validated_data.pop('logo',None)
+        city = validated_data.pop('city',None)
+        state = validated_data.pop('state',None)
+        category = validated_data.pop('category',None)
+        business = validated_data.pop('business',None)
+        is_sell = validated_data.pop('is_sell',None)
+        # Update instance fields with validated data if provided
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.city = City.objects.get(id=int(city[0]))
+        instance.state = State.objects.get(id=int(state[0]))
+        instance.category = Category.objects.get(id=int(category[0]))
+        if is_sell[0] == 'true':
+            instance.is_sell = True
+        elif is_sell[0] == 'false':
+            instance.is_sell = False
+
+        # Save the updated instance
+        instance.save()
         business = Post.objects.get(id=instance.id)
-        if images_data:
+        if images[0] == 'true':
+            PostImage.objects.filter(PostImages=business).delete()
             for image_data in images_data:
                 media = PostImage()
                 firebase_data = storage.child("files/" + image_data.name).put(image_data)
@@ -81,8 +101,18 @@ class PostcrudSerializer(serializers.ModelSerializer):
                 media.deleted = False
                 media.deleted_at = None
                 media.save()
-                business.images.set(media)
-
+                business.images.add(media)
+        if logo[0] == 'true':
+            for image_data in logo_data:
+                media = PostImage()
+                firebase_data = storage.child("files/" + image_data.name).put(image_data)
+                media.file_path = storage.child("files/" + image_data.name).get_url(firebase_data['generation'])
+                media.cdn_link = storage.child("files/" + image_data.name).get_url(firebase_data['generation'])
+                media.file_name = image_data.name
+                media.deleted = False
+                media.deleted_at = None
+                media.save()
+                business.logo = media
         return instance
 
 
