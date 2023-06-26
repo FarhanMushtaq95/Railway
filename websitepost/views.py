@@ -17,6 +17,29 @@ class CreatePostView(APIView):
         return Response(serializer.errors, status=400)
 
 
+class UpdatePostView(APIView):
+    permission_classes = [] # Ensure user is authenticated
+    def put(self, request):
+
+
+        obj_id = request.data.get("id", None)
+        request_data = request.data
+
+        if obj_id is None:
+            return Response({'detail': 'business id missing'}, status=404)
+        else:
+            place = Post.objects.filter(id=obj_id).first()
+            serializer = PostcrudSerializer(place, data=request_data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({"detail": "Business updated"}, status=200)
+        else:
+            return Response(serializer.errors, status=422)
+
+
+
 class GetPostView(APIView):
     permission_classes = [] # Ensure user is authenticated
     def get(self, request):
