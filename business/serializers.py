@@ -123,16 +123,19 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
                 business.business_days_and_hours.add(bus)
                 business.save()
         return business
+
     def update(self, instance, validate_data):
-        validated_data = self.initial_data
+        validated_data = self.initial_data.copy()
         images_data = validated_data.pop('images', None)
         keywords = validated_data.pop('keyword', None)
         category = validated_data.pop('category', None)
         id = validated_data.pop('id', None)
 
-        day_and_business = validated_data.pop('business_days_and_hours',None)
+        day_and_business = validated_data.pop('business_days_and_hours', None)
         id = int(id[0])
-        BusinessRegistration.objects.filter(id=instance.id).update(**validated_data)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
         business = BusinessRegistration.objects.get(id=instance.id)
         BusinessHour.objects.filter(business=business).delete()
         # Retrieve all the associated BusinessImage objects
@@ -157,56 +160,58 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
             business.category = Category.objects.get(id=category[0])
         if day_and_business is None:
             var = [
-                    {
-                            "day": "MON",
-                            "open_time": "09:00:00",
-                            "close_time": "17:00:00",
-                            "closed": False
-                    },
-                    {
-                        "day": "TUE",
-                        "open_time": "09:00:00",
-                        "close_time": "17:00:00",
-                        "closed": False
-                    },
-                    {
-                        "day": "WED",
-                        "open_time": "09:00:00",
-                        "close_time": "17:00:00",
-                        "closed": False
-                    },
-                    {
-                        "day": "THU",
-                        "open_time": "09:00:00",
-                        "close_time": "17:00:00",
-                        "closed": False
-                    },
-                    {
-                        "day": "FRI",
-                        "open_time": "09:00:00",
-                        "close_time": "17:00:00",
-                        "closed": False
-                    },
-                    {
-                        "day": "SAT",
-                        "open_time": None,
-                        "close_time": None,
-                        "closed": True
-                    },
-                    {
-                        "day": "SUN",
-                        "open_time": None,
-                        "close_time": None,
-                        "closed":True
-                    }
+                {
+                    "day": "MON",
+                    "open_time": "09:00:00",
+                    "close_time": "17:00:00",
+                    "closed": False
+                },
+                {
+                    "day": "TUE",
+                    "open_time": "09:00:00",
+                    "close_time": "17:00:00",
+                    "closed": False
+                },
+                {
+                    "day": "WED",
+                    "open_time": "09:00:00",
+                    "close_time": "17:00:00",
+                    "closed": False
+                },
+                {
+                    "day": "THU",
+                    "open_time": "09:00:00",
+                    "close_time": "17:00:00",
+                    "closed": False
+                },
+                {
+                    "day": "FRI",
+                    "open_time": "09:00:00",
+                    "close_time": "17:00:00",
+                    "closed": False
+                },
+                {
+                    "day": "SAT",
+                    "open_time": None,
+                    "close_time": None,
+                    "closed": True
+                },
+                {
+                    "day": "SUN",
+                    "open_time": None,
+                    "close_time": None,
+                    "closed": True
+                }
             ]
             for obj in var:
-                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                bus = BusinessHour.objects.create(business=business, day=obj['day'], opening_time=obj['open_time'],
+                                                  closing_time=obj['close_time'], closed=obj['closed'])
                 business.business_days_and_hours.add(bus)
                 business.save()
         else:
             for obj in day_and_business:
-                bus = BusinessHour.objects.create(business=business,day=obj['day'],opening_time=obj['open_time'],closing_time=obj['close_time'],closed=obj['closed'])
+                bus = BusinessHour.objects.create(business=business, day=obj['day'], opening_time=obj['open_time'],
+                                                  closing_time=obj['close_time'], closed=obj['closed'])
                 business.business_days_and_hours.add(bus)
                 business.save()
 
