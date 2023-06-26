@@ -125,14 +125,16 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         return business
 
     def update(self, instance, validate_data):
-        validated_data = self.initial_data.copy()
+        validated_data = self.validated_data.copy()
         images_data = validated_data.pop('images', None)
+        if self.initial_data['imagesUpdate'] == 'true':
+            images = True
+        else:
+            images = False
         keywords = validated_data.pop('keyword', None)
         category = validated_data.pop('category', None)
-        id = validated_data.pop('id', None)
 
         day_and_business = validated_data.pop('business_days_and_hours', None)
-        id = int(id[0])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -142,8 +144,8 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         business_images = business.images.all()
 
         # Delete the BusinessImage objects
-        business_images.delete()
-        if images_data:
+        if images:
+            business_images.delete()
             for image_data in images_data:
                 media = BusinessImage()
                 firebase_data = storage.child("files/" + image_data.name).put(image_data)
@@ -157,8 +159,8 @@ class BusinessRegistrationSerializer(serializers.ModelSerializer):
         if keywords:
             business.keyword.set(keywords)
         if category:
-            business.category = Category.objects.get(id=category[0])
-        if day_and_business is None:
+            business.category = category
+        if day_and_business is None or day_and_business == ['']:
             var = [
                 {
                     "day": "MON",
