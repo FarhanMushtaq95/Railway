@@ -23,6 +23,6 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('business/', include('business.urls')),
     path('websitepost/', include('websitepost.urls')),
-    path('',index,name="index"),
+    path('app/',index,name="index"),
 
 ]
